@@ -6,6 +6,7 @@ import com.tomisakae.mc_mcp.api.ApiResponse;
 import com.tomisakae.mc_mcp.api.service.PlayerService;
 import com.tomisakae.mc_mcp.api.util.ApiResponseUtil;
 import com.tomisakae.mc_mcp.api.util.MinecraftServerProvider;
+import com.tomisakae.mc_mcp.api.util.PlayerUtil;
 import com.tomisakae.mc_mcp.Mcmcpmod;
 
 import io.javalin.http.Context;
@@ -19,6 +20,41 @@ public class PlayerController {
 
     public PlayerController(PlayerService playerService) {
         this.playerService = playerService;
+    }
+    
+    /**
+     * Phương thức trợ giúp để lấy tên người chơi từ request body hoặc sử dụng mặc định
+     * 
+     * @param ctx Context của request
+     * @param server Server Minecraft
+     * @return Tên người chơi, hoặc null nếu có lỗi
+     */
+    private String getPlayerNameFromRequestOrDefault(Context ctx, MinecraftServer server) {
+        String playerName = null;
+        try {
+            String body = ctx.body();
+            if (body != null && !body.isEmpty()) {
+                JsonObject requestBody = JsonParser.parseString(body).getAsJsonObject();
+                if (requestBody.has("playerName")) {
+                    playerName = requestBody.get("playerName").getAsString();
+                }
+            }
+        } catch (Exception e) {
+            ctx.status(400);
+            ApiResponseUtil.sendJsonResponse(ctx, false, "Body không hợp lệ: " + e.getMessage(), null);
+            return null;
+        }
+        
+        // Sử dụng tên người chơi mặc định nếu không có trong body
+        playerName = PlayerUtil.getPlayerName(playerName, server);
+        
+        if (playerName == null || playerName.isEmpty()) {
+            ctx.status(400);
+            ApiResponseUtil.sendJsonResponse(ctx, false, "Không tìm thấy người chơi mặc định và không có tên người chơi được cung cấp", null);
+            return null;
+        }
+        
+        return playerName;
     }
 
     /**
@@ -34,25 +70,10 @@ public class PlayerController {
             return;
         }
         
-        // Lấy tên người chơi từ body
-        String playerName = null;
-        try {
-            String body = ctx.body();
-            if (body != null && !body.isEmpty()) {
-                JsonObject requestBody = JsonParser.parseString(body).getAsJsonObject();
-                if (requestBody.has("playerName")) {
-                    playerName = requestBody.get("playerName").getAsString();
-                }
-            }
-        } catch (Exception e) {
-            ctx.status(400);
-            ApiResponseUtil.sendJsonResponse(ctx, false, "Body không hợp lệ: " + e.getMessage(), null);
-            return;
-        }
-        
-        if (playerName == null || playerName.isEmpty()) {
-            ctx.status(400);
-            ApiResponseUtil.sendJsonResponse(ctx, false, "Tên người chơi không được để trống", null);
+        // Lấy tên người chơi từ request hoặc sử dụng mặc định
+        String playerName = getPlayerNameFromRequestOrDefault(ctx, server);
+        if (playerName == null) {
+            // Đã xử lý lỗi trong phương thức trợ giúp
             return;
         }
 
@@ -86,21 +107,22 @@ public class PlayerController {
         }
 
         // Lấy tham số từ body, mặc định là 15
-        String playerName = null;
         int radius = 15;
         int verticalRadius = 30;
         boolean includeCommonBlocks = false;
         
+        // Lấy tên người chơi từ request hoặc sử dụng mặc định
+        String playerName = getPlayerNameFromRequestOrDefault(ctx, server);
+        if (playerName == null) {
+            // Đã xử lý lỗi trong phương thức trợ giúp
+            return;
+        }
+        
         try {
-            // Đọc body của request
+            // Đọc body của request để lấy các tham số khác
             String body = ctx.body();
             if (body != null && !body.isEmpty()) {
                 JsonObject requestBody = JsonParser.parseString(body).getAsJsonObject();
-                
-                // Lấy tên người chơi
-                if (requestBody.has("playerName")) {
-                    playerName = requestBody.get("playerName").getAsString();
-                }
                 
                 // Lấy bán kính nếu có
                 if (requestBody.has("radius")) {
@@ -170,22 +192,23 @@ public class PlayerController {
         }
 
         // Lấy tham số từ body
-        String playerName = null;
         int radius = 10;
         String entityType = null; // Lọc theo loại entity
         boolean includePassive = true; // Có bao gồm entity thụ động
         boolean includeHostile = true; // Có bao gồm entity thù địch
         
+        // Lấy tên người chơi từ request hoặc sử dụng mặc định
+        String playerName = getPlayerNameFromRequestOrDefault(ctx, server);
+        if (playerName == null) {
+            // Đã xử lý lỗi trong phương thức trợ giúp
+            return;
+        }
+        
         try {
-            // Đọc body của request
+            // Đọc body của request để lấy các tham số khác
             String body = ctx.body();
             if (body != null && !body.isEmpty()) {
                 JsonObject requestBody = JsonParser.parseString(body).getAsJsonObject();
-                
-                // Lấy tên người chơi
-                if (requestBody.has("playerName")) {
-                    playerName = requestBody.get("playerName").getAsString();
-                }
                 
                 // Lấy bán kính nếu có
                 if (requestBody.has("radius")) {
@@ -251,25 +274,10 @@ public class PlayerController {
             return;
         }
         
-        // Lấy tên người chơi từ body
-        String playerName = null;
-        try {
-            String body = ctx.body();
-            if (body != null && !body.isEmpty()) {
-                JsonObject requestBody = JsonParser.parseString(body).getAsJsonObject();
-                if (requestBody.has("playerName")) {
-                    playerName = requestBody.get("playerName").getAsString();
-                }
-            }
-        } catch (Exception e) {
-            ctx.status(400);
-            ApiResponseUtil.sendJsonResponse(ctx, false, "Body không hợp lệ: " + e.getMessage(), null);
-            return;
-        }
-        
-        if (playerName == null || playerName.isEmpty()) {
-            ctx.status(400);
-            ApiResponseUtil.sendJsonResponse(ctx, false, "Tên người chơi không được để trống", null);
+        // Lấy tên người chơi từ request hoặc sử dụng mặc định
+        String playerName = getPlayerNameFromRequestOrDefault(ctx, server);
+        if (playerName == null) {
+            // Đã xử lý lỗi trong phương thức trợ giúp
             return;
         }
 

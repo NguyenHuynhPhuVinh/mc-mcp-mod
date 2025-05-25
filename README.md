@@ -23,6 +23,24 @@ Tất cả các API đều trả về cấu trúc phản hồi thống nhất:
 }
 ```
 
+## Tên người chơi mặc định
+
+Tất cả các API liên quan đến người chơi đều hỗ trợ việc sử dụng tên người chơi mặc định. Điều này có nghĩa là bạn không cần phải cung cấp tham số `playerName` trong mỗi request. Nếu bạn không cung cấp tên người chơi, hệ thống sẽ tự động sử dụng tên của chủ server hoặc người chơi đầu tiên trong danh sách người chơi online.
+
+Ví dụ, thay vì gửi:
+```json
+{
+  "playerName": "Steve"
+}
+```
+
+Bạn có thể gửi một request rỗng:
+```json
+{}
+```
+
+Và hệ thống sẽ tự động sử dụng tên người chơi mặc định.
+
 ## Danh sách API
 
 ### 1. Kiểm tra trạng thái server
@@ -46,9 +64,11 @@ Tất cả các API đều trả về cấu trúc phản hồi thống nhất:
 - **Body**:
 ```json
 {
-  "playerName": "Steve"
+  "playerName": "Steve" // Tùy chọn, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
 }
 ```
+- **Tham số**:
+  - `playerName` (tùy chọn): Tên người chơi cần lấy thông tin, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
 - **Mô tả**: Lấy thông tin chi tiết về người chơi
 - **Phản hồi mẫu**:
 ```json
@@ -325,6 +345,72 @@ Tất cả các API đều trả về cấu trúc phản hồi thống nhất:
   "data": {
     "command": "give @p diamond 64",
     "result": "Đã cho Steve 64 Diamond"
+  }
+}
+```
+
+### 9. Thực thi lệnh Baritone
+
+- **Endpoint**: `/api/player/baritone`
+- **Phương thức**: POST
+- **Body**:
+```json
+{
+  "playerName": "Steve",
+  "command": "goto 100 64 -200"
+}
+```
+- **Tham số**:
+  - `playerName` (bắt buộc): Tên người chơi sẽ thực thi lệnh Baritone
+  - `command` (bắt buộc): Lệnh Baritone cần thực thi (không cần thêm prefix #)
+- **Mô tả**: Gửi lệnh Baritone đến client của người chơi. Lưu ý rằng người chơi phải đã cài đặt Baritone trên client của họ.
+- **Phản hồi mẫu**:
+```json
+{
+  "success": true,
+  "message": "Lệnh Baritone đã được thực thi thành công",
+  "data": {
+    "command": "goto 100 64 -200",
+    "playerName": "Steve",
+    "timestamp": 1621500000000,
+    "status": "sent",
+    "note": "Lệnh đã được gửi đến client của người chơi. Kết quả thực tế phụ thuộc vào việc người chơi đã cài đặt Baritone chưa."
+  }
+}
+```
+
+### 10. Lấy danh sách lệnh Baritone
+
+- **Endpoint**: `/api/player/baritone/commands`
+- **Phương thức**: GET
+- **Mô tả**: Lấy danh sách các lệnh Baritone hỗ trợ và mô tả của chúng
+- **Phản hồi mẫu**:
+```json
+{
+  "success": true,
+  "message": "Lấy danh sách lệnh Baritone thành công",
+  "data": {
+    "prefix": "#",
+    "description": "Baritone là một bot pathfinding tự động cho Minecraft. Sử dụng prefix # trước mỗi lệnh.",
+    "commands": {
+      "help": "Hiển thị trợ giúp về các lệnh Baritone",
+      "goal": "Đặt mục tiêu đến tọa độ (x y z, x z, hoặc y)",
+      "goto": "Di chuyển đến tọa độ hoặc khối",
+      "mine": "Đào các loại khối cụ thể",
+      "path": "Tìm đường đến mục tiêu hiện tại",
+      "follow": "Theo dõi người chơi hoặc entity",
+      "cancel": "Dừng tất cả các hoạt động của Baritone"
+    },
+    "settings": [
+      "allowBreak", "allowSprint", "allowPlace", "allowParkour", "legitMine"
+    ],
+    "examples": {
+      "goto": "#goto 100 64 -200",
+      "mine": "#mine diamond_ore",
+      "path": "#path",
+      "follow": "#follow player Steve",
+      "stop": "#stop"
+    }
   }
 }
 ```

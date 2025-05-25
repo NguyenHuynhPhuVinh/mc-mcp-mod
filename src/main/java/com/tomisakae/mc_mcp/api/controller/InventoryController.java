@@ -4,6 +4,7 @@ import com.tomisakae.mc_mcp.api.ApiResponse;
 import com.tomisakae.mc_mcp.api.service.InventoryService;
 import com.tomisakae.mc_mcp.api.util.ApiResponseUtil;
 import com.tomisakae.mc_mcp.api.util.MinecraftServerProvider;
+import com.tomisakae.mc_mcp.api.util.PlayerUtil;
 import com.tomisakae.mc_mcp.Mcmcpmod;
 
 import io.javalin.http.Context;
@@ -34,7 +35,7 @@ public class InventoryController {
             return;
         }
         
-        // Lấy tên người chơi từ body
+        // Lấy tên người chơi từ body hoặc sử dụng mặc định
         String playerName = null;
         try {
             String body = ctx.body();
@@ -50,9 +51,12 @@ public class InventoryController {
             return;
         }
         
+        // Sử dụng tên người chơi mặc định nếu không có trong body
+        playerName = PlayerUtil.getPlayerName(playerName, server);
+        
         if (playerName == null || playerName.isEmpty()) {
             ctx.status(400);
-            ApiResponseUtil.sendJsonResponse(ctx, false, "Tên người chơi không được để trống", null);
+            ApiResponseUtil.sendJsonResponse(ctx, false, "Không tìm thấy người chơi mặc định và không có tên người chơi được cung cấp", null);
             return;
         }
         
