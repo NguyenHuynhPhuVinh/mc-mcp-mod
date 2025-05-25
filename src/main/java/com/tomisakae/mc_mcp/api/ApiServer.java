@@ -6,6 +6,7 @@ import io.javalin.json.JavalinJackson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tomisakae.mc_mcp.Mcmcpmod;
 import com.tomisakae.mc_mcp.api.controller.InventoryController;
+import com.tomisakae.mc_mcp.api.controller.CommandController;
 import com.tomisakae.mc_mcp.api.service.InventoryService;
 import com.tomisakae.mc_mcp.api.config.ApiConfig;
 import com.tomisakae.mc_mcp.api.exception.ApiExceptionHandler;
@@ -18,6 +19,7 @@ public class ApiServer {
     private static ApiServer instance;
     private final ApiConfig config;
     private final InventoryController inventoryController;
+    private final CommandController commandController;
 
     private ApiServer(ApiConfig config) {
         this.config = config;
@@ -33,6 +35,9 @@ public class ApiServer {
                 }));
             }
             
+            // Bật log chi tiết cho development
+            javalinConfig.plugins.enableDevLogging();
+            
             // Cấu hình JSON mapper
             javalinConfig.jsonMapper(new JavalinJackson(objectMapper));
         }).exception(Exception.class, new ApiExceptionHandler());
@@ -40,6 +45,7 @@ public class ApiServer {
         // Khởi tạo các service và controller
         InventoryService inventoryService = new InventoryService();
         this.inventoryController = new InventoryController(inventoryService);
+        this.commandController = new CommandController();
         
         // Đăng ký các endpoint
         registerRoutes();
@@ -70,15 +76,20 @@ public class ApiServer {
         return instance;
     }
 
+    // Phương thức này không cần thiết vì cấu hình đã được thực hiện trong constructor
+
     /**
      * Đăng ký các route cho API
      */
     private void registerRoutes() {
-        // API endpoint để kiểm tra server hoạt động
+        // Đăng ký route cho health check
         app.get("/api/health", this::healthCheck);
         
         // Đăng ký route cho inventory
         app.get("/api/player/{playerName}/inventory", inventoryController::getPlayerInventoryAsJson);
+        
+        // Đăng ký route cho thực thi lệnh - sử dụng POST để gửi dữ liệu trong body
+        app.post("/api/command", commandController::executeCommand);
     }
 
     /**
