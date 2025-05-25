@@ -92,8 +92,22 @@ public class ApiServer {
      * Khởi động server API
      */
     public void start() {
-        app.start(config.getPort());
-        Mcmcpmod.LOGGER.info("API server started on port " + config.getPort());
+        try {
+            app.start(config.getPort());
+            Mcmcpmod.LOGGER.info("API server started on port " + config.getPort());
+        } catch (IllegalStateException e) {
+            // Nếu server đã được khởi động, tạo một instance mới
+            if (e.getMessage().contains("Server already started")) {
+                Mcmcpmod.LOGGER.info("API server đã được khởi động trước đó, tạo một instance mới");
+                instance = new ApiServer(config);
+                instance.app.start(config.getPort());
+                Mcmcpmod.LOGGER.info("API server mới đã được khởi động trên port " + config.getPort());
+            } else {
+                // Nếu là lỗi khác, ghi log và ném lại ngoại lệ
+                Mcmcpmod.LOGGER.error("Lỗi khi khởi động API server: " + e.getMessage());
+                throw e;
+            }
+        }
     }
 
     /**
@@ -101,8 +115,13 @@ public class ApiServer {
      */
     public void stop() {
         if (app != null) {
-            app.stop();
-            Mcmcpmod.LOGGER.info("API server stopped");
+            try {
+                app.stop();
+                Mcmcpmod.LOGGER.info("API server stopped");
+            } catch (Exception e) {
+                // Ghi log lỗi nhưng không ném ngoại lệ
+                Mcmcpmod.LOGGER.error("Lỗi khi dừng API server: " + e.getMessage());
+            }
         }
     }
 }
