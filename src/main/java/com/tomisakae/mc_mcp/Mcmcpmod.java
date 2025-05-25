@@ -1,9 +1,13 @@
 package com.tomisakae.mc_mcp;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.tomisakae.mc_mcp.api.ApiServer;
+import com.tomisakae.mc_mcp.api.util.MinecraftServerProvider;
 
 public class Mcmcpmod implements ModInitializer {
 	public static final String MOD_ID = "mc-mcp-mod";
@@ -19,6 +23,22 @@ public class Mcmcpmod implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		LOGGER.info("Hello Fabric world!");
+		LOGGER.info("Khởi động MC-MCP Mod!");
+		
+		// Đăng ký sự kiện để khởi động API server khi Minecraft server khởi động
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+			LOGGER.info("Minecraft server đã khởi động, bắt đầu khởi động API server...");
+			// Lưu trữ instance của MinecraftServer để sử dụng sau này
+			MinecraftServerProvider.setServer(server);
+			ApiServer.getInstance().start();
+		});
+		
+		// Đăng ký sự kiện để dừng API server khi Minecraft server dừng
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+			LOGGER.info("Minecraft server đang dừng, dừng API server...");
+			ApiServer.getInstance().stop();
+			// Xóa instance của MinecraftServer
+			MinecraftServerProvider.clearServer();
+		});
 	}
 }
