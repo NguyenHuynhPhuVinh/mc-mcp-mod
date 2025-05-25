@@ -110,9 +110,11 @@ Và hệ thống sẽ tự động sử dụng tên người chơi mặc định
 - **Body**:
 ```json
 {
-  "playerName": "Steve"
+  "playerName": "Steve" // Tùy chọn, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
 }
 ```
+- **Tham số**:
+  - `playerName` (tùy chọn): Tên người chơi cần lấy thông tin túi đồ, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
 - **Mô tả**: Lấy thông tin túi đồ của người chơi
 - **Phản hồi mẫu**:
 ```json
@@ -165,14 +167,14 @@ Và hệ thống sẽ tự động sử dụng tên người chơi mặc định
 - **Body**:
 ```json
 {
-  "playerName": "Steve",
+  "playerName": "Steve", // Tùy chọn, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
   "radius": 15,
   "verticalRadius": 30,
   "includeCommonBlocks": false
 }
 ```
 - **Tham số**:
-  - `playerName` (bắt buộc): Tên người chơi
+  - `playerName` (tùy chọn): Tên người chơi, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
   - `radius` (tùy chọn): Bán kính quét ngang, mặc định là 15, tối đa 30
   - `verticalRadius` (tùy chọn): Bán kính quét dọc, mặc định là gấp đôi radius, tối đa 60
   - `includeCommonBlocks` (tùy chọn): Có bao gồm các khối phổ biến không, mặc định là false
@@ -224,7 +226,7 @@ Và hệ thống sẽ tự động sử dụng tên người chơi mặc định
 - **Body**:
 ```json
 {
-  "playerName": "Steve",
+  "playerName": "Steve", // Tùy chọn, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
   "radius": 20,
   "entityType": "zombie",
   "includePassive": false,
@@ -232,12 +234,12 @@ Và hệ thống sẽ tự động sử dụng tên người chơi mặc định
 }
 ```
 - **Tham số**:
-  - `playerName` (bắt buộc): Tên người chơi
+  - `playerName` (tùy chọn): Tên người chơi, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
   - `radius` (tùy chọn): Bán kính quét, mặc định là 10, tối đa 50
   - `entityType` (tùy chọn): Loại entity cần lọc, để trống để lấy tất cả
   - `includePassive` (tùy chọn): Có bao gồm entity thụ động không, mặc định là true
   - `includeHostile` (tùy chọn): Có bao gồm entity thù địch không, mặc định là true
-- **Mô tả**: Lấy danh sách các entity gần người chơi
+- **Mô tả**: Lấy danh sách các entity gần người chơi. Nếu không cung cấp playerName, sẽ sử dụng tên người chơi mặc định.
 - **Phản hồi mẫu**:
 ```json
 {
@@ -273,9 +275,11 @@ Và hệ thống sẽ tự động sử dụng tên người chơi mặc định
 - **Body**:
 ```json
 {
-  "playerName": "Steve"
+  "playerName": "Steve" // Tùy chọn, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
 }
 ```
+- **Tham số**:
+  - `playerName` (tùy chọn): Tên người chơi cần lấy thống kê, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
 - **Mô tả**: Lấy thống kê của người chơi
 - **Phản hồi mẫu**:
 ```json
@@ -356,12 +360,12 @@ Và hệ thống sẽ tự động sử dụng tên người chơi mặc định
 - **Body**:
 ```json
 {
-  "playerName": "Steve",
+  "playerName": "Steve", // Tùy chọn, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
   "command": "goto 100 64 -200"
 }
 ```
 - **Tham số**:
-  - `playerName` (bắt buộc): Tên người chơi sẽ thực thi lệnh Baritone
+  - `playerName` (tùy chọn): Tên người chơi sẽ thực thi lệnh Baritone, nếu không cung cấp sẽ sử dụng tên người chơi mặc định
   - `command` (bắt buộc): Lệnh Baritone cần thực thi (không cần thêm prefix #)
 - **Mô tả**: Gửi lệnh Baritone đến client của người chơi. Lưu ý rằng người chơi phải đã cài đặt Baritone trên client của họ.
 - **Phản hồi mẫu**:
