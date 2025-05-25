@@ -7,7 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tomisakae.mc_mcp.Mcmcpmod;
 import com.tomisakae.mc_mcp.api.controller.InventoryController;
 import com.tomisakae.mc_mcp.api.controller.CommandController;
+import com.tomisakae.mc_mcp.api.controller.PlayerController;
+import com.tomisakae.mc_mcp.api.controller.WorldController;
 import com.tomisakae.mc_mcp.api.service.InventoryService;
+import com.tomisakae.mc_mcp.api.service.PlayerService;
+import com.tomisakae.mc_mcp.api.service.WorldService;
 import com.tomisakae.mc_mcp.api.config.ApiConfig;
 import com.tomisakae.mc_mcp.api.exception.ApiExceptionHandler;
 
@@ -20,6 +24,8 @@ public class ApiServer {
     private final ApiConfig config;
     private final InventoryController inventoryController;
     private final CommandController commandController;
+    private final PlayerController playerController;
+    private final WorldController worldController;
 
     private ApiServer(ApiConfig config) {
         this.config = config;
@@ -44,8 +50,13 @@ public class ApiServer {
         
         // Khởi tạo các service và controller
         InventoryService inventoryService = new InventoryService();
+        PlayerService playerService = new PlayerService();
+        WorldService worldService = new WorldService();
+        
         this.inventoryController = new InventoryController(inventoryService);
         this.commandController = new CommandController();
+        this.playerController = new PlayerController(playerService);
+        this.worldController = new WorldController(worldService);
         
         // Đăng ký các endpoint
         registerRoutes();
@@ -85,11 +96,18 @@ public class ApiServer {
         // Đăng ký route cho health check
         app.get("/api/health", this::healthCheck);
         
-        // Đăng ký route cho inventory
-        app.get("/api/player/{playerName}/inventory", inventoryController::getPlayerInventoryAsJson);
-        
         // Đăng ký route cho thực thi lệnh - sử dụng POST để gửi dữ liệu trong body
         app.post("/api/command", commandController::executeCommand);
+        
+        // Đăng ký các route cho thông tin người chơi - tất cả đều sử dụng POST với tên người chơi trong body
+        app.post("/api/player/info", playerController::getPlayerInfo);
+        app.post("/api/player/inventory", inventoryController::getPlayerInventoryAsJson);
+        app.post("/api/player/surroundings", playerController::getPlayerSurroundings);
+        app.post("/api/player/entities", playerController::getNearbyEntities);
+        app.post("/api/player/statistics", playerController::getPlayerStatistics);
+        
+        // Đăng ký route cho thông tin thế giới
+        app.get("/api/world/info", worldController::getWorldInfo);
     }
 
     /**
