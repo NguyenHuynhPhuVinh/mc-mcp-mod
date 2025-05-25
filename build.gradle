@@ -22,6 +22,7 @@ repositories {
 // Cấu hình để đóng gói các thư viện phụ thuộc vào JAR
 configurations {
 	include
+	includeImplementation.extendsFrom(include)
 }
 
 fabricApi {
@@ -94,7 +95,7 @@ jar {
 	
 	// Đóng gói các thư viện phụ thuộc vào JAR
 	from {
-		configurations.include.collect { it.isDirectory() ? it : zipTree(it) }
+		configurations.includeImplementation.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 	
 	// Xử lý các xung đột về file
