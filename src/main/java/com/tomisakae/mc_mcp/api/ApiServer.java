@@ -9,10 +9,11 @@ import com.tomisakae.mc_mcp.api.controller.InventoryController;
 import com.tomisakae.mc_mcp.api.controller.CommandController;
 import com.tomisakae.mc_mcp.api.controller.PlayerController;
 import com.tomisakae.mc_mcp.api.controller.WorldController;
-import com.tomisakae.mc_mcp.api.controller.BaritoneController;
+import com.tomisakae.mc_mcp.api.controller.ItemController;
 import com.tomisakae.mc_mcp.api.service.InventoryService;
 import com.tomisakae.mc_mcp.api.service.PlayerService;
 import com.tomisakae.mc_mcp.api.service.WorldService;
+import com.tomisakae.mc_mcp.api.service.ItemService;
 import com.tomisakae.mc_mcp.api.config.ApiConfig;
 import com.tomisakae.mc_mcp.api.exception.ApiExceptionHandler;
 
@@ -27,7 +28,7 @@ public class ApiServer {
     private final CommandController commandController;
     private final PlayerController playerController;
     private final WorldController worldController;
-    private final BaritoneController baritoneController;
+    private final ItemController itemController;
 
     private ApiServer(ApiConfig config) {
         this.config = config;
@@ -54,12 +55,13 @@ public class ApiServer {
         InventoryService inventoryService = new InventoryService();
         PlayerService playerService = new PlayerService();
         WorldService worldService = new WorldService();
+        ItemService itemService = new ItemService();
         
         this.inventoryController = new InventoryController(inventoryService);
         this.commandController = new CommandController();
         this.playerController = new PlayerController(playerService);
         this.worldController = new WorldController(worldService);
-        this.baritoneController = new BaritoneController();
+        this.itemController = new ItemController(itemService);
         
         // Đăng ký các endpoint
         registerRoutes();
@@ -112,9 +114,9 @@ public class ApiServer {
         // Đăng ký route cho thông tin thế giới
         app.get("/api/world/info", worldController::getWorldInfo);
         
-        // Đăng ký route cho Baritone
-        app.post("/api/player/baritone", baritoneController::executeBaritoneCommand);
-        app.get("/api/player/baritone/commands", baritoneController::getBaritoneCommands);
+        // Đăng ký route cho vật phẩm và công thức chế tạo
+        app.get("/api/items", itemController::getAllItems);
+        app.post("/api/items/recipes", itemController::getRecipesForItem);
     }
 
     /**
